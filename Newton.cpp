@@ -219,11 +219,11 @@ vector<vector<vector<double>>> NewtonPol(cv::Mat& src)
 	resize(i45, S1_fin, S1_fin.size());
 	resize(i90, S2_fin, S2_fin.size());
 	resize(i135, S3_fin, S2_fin.size());
-	imshow("0", S0_fin);
-	imshow("45", S1_fin);
-	imshow("90", S2_fin);
-	imshow("135", S2_fin);
-	waitKey(0);
+	//imshow("0", S0_fin);
+	//imshow("45", S1_fin);
+	//imshow("90", S2_fin);
+	//imshow("135", S2_fin);
+	//waitKey(0);
 
 	return result;
 }

@@ -43,7 +43,7 @@ vector<Mat> stokesVector(vector<vector<vector<double>>> I)
 	vector<vector<double>> ii(h, vector<double>(w));
 	for (int i = 0; i < h; i++) {
 		for (int k = 0; k < w; k++) {
-			ii[i][k] = I[0][i][k] + I[2][i][k];
+			ii[i][k] = 0.5*(I[0][i][k] + I[1][i][k] + I[2][i][k] + I[3][i][k]);
 
 		}
 	}
@@ -113,7 +113,7 @@ Mat aolp(vector<Mat> S)
 	for (int i = 0; i < result.rows; i++) {
 		for (int k = 0; k < result.cols; k++) {
 			result.at<double>(i, k) = fmod(0.5 * atan2(S[2].at<double>(i, k), S[1].at<double>(i, k)), 3.14159265358979323846);
-			cout << result.at<double>(i, k) << " ";
+			//cout << result.at<double>(i, k) << " ";
 		}
 	}
 	Mat show = Mat(S[0].rows, S[0].cols, DataType<double>::type);
@@ -140,7 +140,8 @@ Mat dolp(vector<Mat> S)
 			result.at<double>(i, k) = sqrt(S[1].at<double>(i, k) * S[1].at<double>(i, k) + S[2].at<double>(i, k) * S[2].at<double>(i, k))/ S[0].at<double>(i, k);
 		}
 	}
-	normalize(result, result, 1.0, 0, NORM_MINMAX);
+	Mat show = Mat(S[0].rows, S[0].cols, DataType<double>::type);
+	normalize(result, show, 1.0, 0, NORM_MINMAX);
 	Mat S0_fin = Mat(S[0].rows / 2, S[0].cols / 2, DataType<double>::type);
 	resize(result, S0_fin, S0_fin.size());
 	for (int i = 0; i < result.rows; i++) {
@@ -148,7 +149,7 @@ Mat dolp(vector<Mat> S)
 			result.at<double>(i, k) = 255 * result.at<double>(i, k);
 		}
 	}
-	imwrite("DoLP.jpg", result);
+	imwrite("DoLP.jpg", show);
 	imshow("DoLP", S0_fin);
 	//waitKey(0);
 
@@ -162,7 +163,9 @@ Mat aolpColor(vector<Mat> S)
 	Mat result = Mat(S[0].rows, S[0].cols, CV_64FC3);
 	for (int i = 0; i < result.rows; i++) {
 		for (int k = 0; k < result.cols; k++) {
-			result.at<Vec3d>(i, k)[0] = (fmod(a.at<double>(i, k), 3.14159265358979323846) / 3.14159265358979323846) * 179;
+			double x = (sqrt(a.at<double>(i, k) * a.at<double>(i, k))) * 179;
+			//cout << x;
+			result.at<Vec3d>(i, k)[0] = (sqrt(a.at<double>(i, k) * a.at<double>(i, k)) / 3.14159265358979323846) * 179;
 			result.at<Vec3d>(i, k)[1] = double(255);
 			result.at<Vec3d>(i, k)[2] = double(255);
 		}
