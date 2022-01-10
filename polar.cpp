@@ -22,7 +22,7 @@ PictureSeries wczytaj_serie();
 int main()
 {
     Mat img;
-    String s = "./foto/polarcam/polm16.raw";
+    String s = "./foto/polarcam/polm8.raw";
     int w = 2448;
     int h = 2048;
     //Demosaicing(s, img, w, h);
@@ -40,7 +40,6 @@ int main()
 		cout << "Unable to open file" << endl;
 		return -1;
 	}
-	
 	// 16 bit -> short
 	// Stop eating new lines in binary mode!!!
 	inFile.unsetf(std::ios::skipws);
@@ -52,75 +51,20 @@ int main()
 	//read data
 	inFile.read((char*)RawImage.data, cols * rows * sizeof(char)); //<-- 16 bit short
 	inFile.close();
+    
 	//imshow("raw", RawImage);
 	//waitKey(0);
-	/*
-	unsigned char max = 0.0;
-	unsigned char min = 0.0;
-	for (int i = 0; i < RawImage.rows; i++) {
-		for (int k = 0; k < RawImage.cols; k++) {
-			
-			if (RawImage.at<unsigned char>(i, k) < min) min = RawImage.at<unsigned char>(i, k);
-			if (RawImage.at<unsigned char>(i, k) > max) max = RawImage.at<unsigned char>(i, k);
-		}
-	}
-	cout << endl << "MIN/MAX dla rawimage" << endl;
-	cout << min << endl;
-	cout << max << endl;
-	*/
 
-
+    
 	vector<vector<vector<double>>> newton = NewtonPol(RawImage);
-
+    
 	vector<Mat> sVector = stokesVector(newton);
 
-	double max = 0.0;
-	double min = 0.0;
-	/*
-	for (int g = 0; g < 4; g++) {
-		for (int i = 0; i < 2048; i++) {
-			for (int k = 0; k < 2448; k++) {
-				if (newton[g][i][k] < min) min = newton[g][i][k];
-				if (newton[g][i][k] > max) max = newton[g][i][k];
-			}
-		}	
-	}
-	*/
+    aolp(sVector);
+    aolpColor(sVector);
+    dolpColor(sVector);
 
-
-
-
-
-
-	/*
-		out = np.zeros(DOLPP.shape, np.double)
-		DOLPP = bytescale(normalize(DOLPP, out, 1.0, 0.0,
-			NORM_MINMAX, dtype = CV_32F))
-		
-		aop = (1 / 2) * np.arctan2(u, q)
-
-		AOPP = np.double(aop)
-
-		out = np.zeros(AOPP.shape, np.double)
-		AOPP = bytescale(normalize(AOPP, out, 1.0, 0.0,
-			NORM_MINMAX, dtype = CV_32F))
-
-		#SOP = np.uint8(SOP)
-		#DOLPP = np.uint8(DOLPP)
-		#AOPP = np.uint8(AOPP)
-
-		imshow('Intensity', SOP)
-		waitKey(0);
-		destroyAllWindows()
-
-		imshow('DOP', DOLPP)
-		waitKey(0);
-		destroyAllWindows()
-
-		imshow('AOP', AOPP)
-		waitKey(0);
-		
-*/
+	
     //wczytaj_serie();
     
 

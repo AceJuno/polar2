@@ -20,7 +20,6 @@ vector<vector<vector<double>>> NewtonPol(cv::Mat& src)
 	//R.push_back(R3);
 
 	src.convertTo(src, CV_64F);
-
 	vector <vector <int>> O(rows,vector<int> (cols));
 	for (int i = 0; i < rows; i++) {
 		for (int k = 0; k < cols; k++) {
@@ -31,7 +30,7 @@ vector<vector<vector<double>>> NewtonPol(cv::Mat& src)
 		}
 	}
 
-	cout << src.size();
+
 	//intermediate results
 	vector <vector <double>> I(rows, vector<double>(cols));
 	
@@ -78,7 +77,7 @@ vector<vector<vector<double>>> NewtonPol(cv::Mat& src)
 	}
 
 
-	double thao = 5.8;
+	double thao = 7;
 
 	for (int i = 3; i < rows - 4; i++) {
 		for (int j = 3; j < cols - 4; j++) {
@@ -179,6 +178,52 @@ vector<vector<vector<double>>> NewtonPol(cv::Mat& src)
 	result.push_back(I45);
 	result.push_back(I90);
 	result.push_back(I135);
+
+	
+	int scols = cols/4 ;
+	int srows = rows/4 ;
+	Mat i0 = Mat(srows, scols, DataType<double>::type);
+	Mat i45 = Mat(srows, scols, DataType<double>::type);
+	Mat i90 = Mat(srows, scols, DataType<double>::type);
+	Mat i135 = Mat(srows, scols, DataType<double>::type);
+	
+	for (int i = 0; i < rows - 1; i++) {
+		for (int k = 0; k < cols - 1; k++) {
+			if (i % 2 == 0 && k % 2 == 0) i0.at<double>(i / 4, k / 4) = src.at<double>(i, k);
+			else if (i % 2 == 1 && k % 2 == 0) i45.at<double>(i / 4, k / 4) = src.at<double>(i, k);
+			else if (i % 2 == 0 && k % 2 == 1) i90.at<double>(i / 4, k / 4) = src.at<double>(i, k);
+			else if (i % 2 == 1 && k % 2 == 1)  i135.at<double>(i / 4, k / 4) = src.at<double>(i, k);
+		}
+	}
+	/*
+	for (int i = 0; i < rows; i++) {
+		for (int k = 0; k < cols; k++) {
+			i0.at<double>(i, k) = I0[i][k];
+			i45.at<double>(i, k) = I45[i][k];
+			i90.at<double>(i, k) = I90[i][k];
+			i135.at<double>(i, k) = I135[i][k];
+		}
+	}
+	*/
+	normalize(i0, i0, 1.0, 0, NORM_MINMAX);
+	normalize(i45, i45, 1.0, 0, NORM_MINMAX);
+	normalize(i90, i90, 1.0, 0, NORM_MINMAX);
+	normalize(i135, i135, 1.0, 0, NORM_MINMAX);
+
+	Mat S0_fin = Mat(rows / 4, cols / 4, DataType<double>::type);
+	Mat S1_fin = Mat(rows / 4, cols / 4, DataType<double>::type);
+	Mat S2_fin = Mat(rows / 4, cols / 4, DataType<double>::type);
+	Mat S3_fin = Mat(rows / 4, cols / 4, DataType<double>::type);
+
+	resize(i0, S0_fin, S0_fin.size());
+	resize(i45, S1_fin, S1_fin.size());
+	resize(i90, S2_fin, S2_fin.size());
+	resize(i135, S3_fin, S2_fin.size());
+	imshow("0", S0_fin);
+	imshow("45", S1_fin);
+	imshow("90", S2_fin);
+	imshow("135", S2_fin);
+	waitKey(0);
 
 	return result;
 }
