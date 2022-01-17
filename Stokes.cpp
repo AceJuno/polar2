@@ -160,6 +160,7 @@ Mat dolp(vector<Mat> S)
 Mat aolpColor(vector<Mat> S)
 {
 	Mat a = aolp(S);
+	Mat d = dolp(S);
 	Mat result = Mat(S[0].rows, S[0].cols, CV_64FC3);
 	for (int i = 0; i < result.rows; i++) {
 		for (int k = 0; k < result.cols; k++) {
@@ -167,7 +168,7 @@ Mat aolpColor(vector<Mat> S)
 			//cout << x;
 			result.at<Vec3d>(i, k)[0] = (sqrt(a.at<double>(i, k) * a.at<double>(i, k)) / 3.14159265358979323846) * 179;
 			result.at<Vec3d>(i, k)[1] = double(255);
-			result.at<Vec3d>(i, k)[2] = double(255);
+			result.at<Vec3d>(i, k)[2] = d.at<double>(i, k) *255;
 		}
 	}
 	Mat imHSV = Mat(S[0].rows, S[0].cols, CV_32FC3);
