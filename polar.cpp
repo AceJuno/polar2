@@ -12,6 +12,8 @@
 #include "Demosaicing.hpp"
 #include "Newton.h"
 #include "Stokes.h"
+#include "Mueller.h"
+
 using namespace cv;
 using namespace std;
 
@@ -21,53 +23,58 @@ PictureSeries wczytaj_serie();
 
 int main()
 {
-    Mat img;
-    String s = "./foto/polarcam/polm8.raw";
-    int w = 2448;
-    int h = 2048;
-    //Demosaicing(s, img, w, h);
-    //imshow("test", img);
-    //waitKey(0);
-	Mat out1 = Mat(h, w, DataType<double>::type);
-
-	Mat RawImage;
+	Mat raw;
 	int rows = 2048;
 	int cols = 2448;;
-	RawImage.create(rows, cols, CV_8UC1);
-	ifstream inFile;
-	inFile.open(s, ios::binary);
-	if (!inFile.is_open()) {
-		cout << "Unable to open file" << endl;
-		return -1;
-	}
-	// 16 bit -> short
-	// Stop eating new lines in binary mode!!!
-	inFile.unsetf(std::ios::skipws);
-	// get its size:
-	std::streampos fileSize;
-	inFile.seekg(0, std::ios::end);
-	fileSize = inFile.tellg();
-	inFile.seekg(0, std::ios::beg);
-	//read data
-	inFile.read((char*)RawImage.data, cols * rows * sizeof(char)); //<-- 16 bit short
-	inFile.close();
-    
+	raw.create(rows, cols, CV_8UC1);
+
+    char strInputFile[] = "./foto/polarcam/polm16.raw";
+    RawImage rrr = RawImage(strInputFile, cols, rows);
+
+    //raw = RawImage::imageInput(strInputFile, cols, rows);
+ 
 	//imshow("raw", RawImage);
 	//waitKey(0);
-
+    //vector<vector<vector<double>>> newton = NewtonPol(RawImage);
+    Mat dragon = imread("./foto/polarcam/dragon.png", 0);
+    //Mat camera = imread("./foto/polarcam/fruits.png", 0);
+	vector<vector<vector<double>>> newtondragon = Newton::NewtonPol(dragon);
+    //vector<vector<vector<double>>> newtoncamera = Newton::NewtonPol(camera);
     
-	vector<vector<vector<double>>> newton = NewtonPol(RawImage);
+	vector<Mat> sdVector = Stokes::stokesVector(newtondragon);
+    //vector<Mat> scVector = Stokes::stokesVector(newtoncamera);
+   
+    //Stokes::aolp(sdVector);
+    Stokes::aolpColor(sdVector);
+    //Stokes::aolpColor(scVector);
+    waitKey(0);
+    //dolpColor(sVector);
+    /*
     
-	vector<Mat> sVector = stokesVector(newton);
+    vector<Mat> images;
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 4; j++) {
+            //Mat image;
+            int numl = 45 * i;
+            int numc = 45 * j;
+            Mat image = imread("./mueller/various_l" + to_string(numl) +"_c" + to_string(numc) + ".exr", -1);
+            //cout << "./mueller/various_l" + to_string(numl) + "_c" + to_string(numc) + ".exr";
+            images.push_back(image);
+            //imshow("l" + to_string(numl) + "_c" + to_string(numc), image);
+        }
+    }
+    vector<vector<Mat>> mueller = muellerMatrix(images, 4, 45);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            imshow("m" + to_string(i) + to_string(j), mueller[i][j]);
 
-    aolp(sVector);
-    aolpColor(sVector);
-    dolpColor(sVector);
+            imwrite("m" + to_string(i) + to_string(j) + ".jpg", mueller[i][j]);
 
-	
-    //wczytaj_serie();
-    
+        }
+    }
+    */
 
+    waitKey(0);
 
     return 0;
 }
@@ -76,53 +83,3 @@ int main()
 
 
 
-void wypisz_menu()
-{
-    cout << "Polar - program do przetwarzania obrazów polaryzacyjncyh" << endl;
-    cout << "Wybierz opcje poniżej i zatwierdź Enter" << endl;
-    cout << "1 - Wczytaj obraz polaryzacyjny" << endl;
-    cout << "2 - Wczytaj serię obrazów z kolejnymi kątami polaryzacji" << endl;
-    cout << "3 - " << endl;
-    cout << "4 - " << endl;
-    cout << "5 - " << endl;
-
-}
-
-PictureSeries wczytaj_serie()
-{
-    cout << "Czy dodałeś obrazy do folderu foto? (Y/N)" << endl;
-    cout << "Podaj liczbe obrazów: ";
-    int l;
-    cin >> l;
-    cout << "Podaj wartość kąta: ";
-    int angle;
-    cin >> angle;
-
-    cout << "Poprawna nazwa obrazu to {nazwa}_{kąt}.{rozszerzenie}" << endl;
-    cout << "Podaj nazwe pierwszego obrazu: ";
-    string name;
-    cin >> name;
-
-    PictureSeries pics(name, angle, l);
-    return pics;
-}
-
-RawImage wczytaj_raw() 
-{
-    int width, height;
-    string name;
-    /*
-    cout << "Podaj wysokość obrazu: ";
-    cin >> height;
-    cout << "Podaj szerokość obrazu: ";
-    cin >> width;
-    cout << "Poprawna nazwa obrazu to \"{nazwa}_{kąt}.{rozszerzenie}\": ";
-    cin >> name;
-
-    do testów */
-    name = "polm8.raw";
-    width = 2448;
-    height = 2048;
-    RawImage r(name, width, height);
-    return r;
-}

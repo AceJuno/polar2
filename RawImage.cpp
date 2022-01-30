@@ -4,23 +4,27 @@
 
 
 
-RawImage::RawImage(String  name, int w, int h)
+RawImage::RawImage(char strInputFile[], int w, int h)
 {
     this->width = w;
     this->height = h;
-    name = "./foto/" + name;
-    FILE* fp = fopen(name.c_str(), "rb");
-    char* imgData = (char*)malloc(sizeof(char) * w * h);
-    fread(imgData, sizeof(char), w * h, fp);
+
+    this->img = imageInput(strInputFile, w, h);
+}
+
+Mat RawImage::imageInput(char strInputFile[], int w, int h)
+{
+    Mat img;
+    int width = w;
+    int height = h;
     img.create(h, w, CV_8UC1);
+    FILE* pInput = NULL;
+    char* buf = new char[w * h];
+    pInput = fopen(strInputFile, "rb");
 
-    memcpy(img.data, imgData, w * h);
+    fread((char*)img.data, 1, w * h, pInput);
 
-    free(imgData);
+    fclose(pInput);
 
-    fclose(fp);
-    imshow("test", img);
-    waitKey(0);
-
-    this->img = img;
+    return Mat();
 }

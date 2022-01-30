@@ -8,4 +8,14 @@
 using namespace std;
 using namespace cv;
 
-vector<Mat> muellerMatrix(vector<Mat> Stokes);
+
+
+class Mueller
+{
+public:
+	vector<vector<Mat>> matrix;
+
+	Mueller(vector<Mat> Images, int N, int angle);
+
+	static vector<vector<Mat>> muellerMatrix(vector<Mat> Images, int N, int angle);
+};
